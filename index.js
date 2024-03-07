@@ -48,7 +48,7 @@ const scrapeWithPagination = async (page, numOfJobsToScrape, baseUrl) => {
     await page.goto(url, { waitUntil: "networkidle0" });
 
     const newItems = await page.evaluate(() => {
-      const jobElements = document.querySelectorAll(".job-cards");
+      const jobElements = document.querySelectorAll(".job-card");
       const pageItems = [];
 
       jobElements.forEach((element) => {
@@ -60,7 +60,7 @@ const scrapeWithPagination = async (page, numOfJobsToScrape, baseUrl) => {
           .querySelector(".job-card__location")
           .innerText.trim();
 
-        const url = element.querySelector("a").href;
+        const url = element.href;
 
         pageItems.push({ title, location, url });
       });
