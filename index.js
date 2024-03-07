@@ -104,7 +104,9 @@ const scrapeInfiniteScrollItems = async (page, numOfJobsToScrape) => {
           .querySelector(".card-content .name")
           .innerText.trim();
 
-        const url = element.querySelector(".bottom-row .details-btn a").href;
+        const url = element.querySelector(
+          ".lx-button.lx-blue-btn.details-btn"
+        ).href;
 
         jobsData.push({ title, company, description, url });
       });
@@ -137,21 +139,13 @@ app.get("/:numOfJobsToScrape", async (req, res) => {
     let combinedJobs = [];
 
     // Initialize CSV writer
-    const csvWriterScroll = createObjectCsvWriter({
+    const csvWriter = createObjectCsvWriter({
       path: "jobs.csv",
       header: [
         { id: "title", title: "Title" },
         { id: "company", title: "Company" },
-        { id: "description", title: "Description" },
-        { id: "url", title: "URL" },
-      ],
-    });
-
-    const csvWriterPagination = createObjectCsvWriter({
-      path: "jobs.csv",
-      header: [
-        { id: "title", title: "Title" },
         { id: "location", title: "Location" },
+        { id: "description", title: "Description" },
         { id: "url", title: "URL" },
       ],
     });
@@ -159,14 +153,9 @@ app.get("/:numOfJobsToScrape", async (req, res) => {
     for (const url of urls) {
       const jobs = await scrapeJobs(url, jobsPerSite);
       combinedJobs = combinedJobs.concat(jobs);
-
-      // Write job details to a CSV file
-      if (url.includes("laborx.com")) {
-        await csvWriterScroll.writeRecords(combinedJobs);
-      } else if (url.includes("aquent.com")) {
-        await csvWriterPagination.writeRecords(combinedJobs);
-      }
     }
+
+    await csvWriter.writeRecords(combinedJobs);
 
     res.json(combinedJobs);
 
